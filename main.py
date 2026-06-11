@@ -4,8 +4,9 @@ import tempfile
 import streamlit as st
 from langchain_community.document_loaders import (  PyPDFLoader )
 from langchain_text_splitters import (    RecursiveCharacterTextSplitter )
-from langchain_chroma import (    Chroma  )
-from langchain_openai import   OpenAIEmbeddings,    ChatOpenAI 
+# Vector DB (메모리 내장형 — chromadb/sqlite/protobuf 불필요)
+from langchain_core.vectorstores import (    InMemoryVectorStore  )
+from langchain_openai import   OpenAIEmbeddings,    ChatOpenAI
 from langchain_classic.chains import (   create_retrieval_chain )
 from langchain_classic.chains.combine_documents import create_stuff_documents_chain
 
@@ -64,6 +65,11 @@ class StreamHandler(  BaseCallbackHandler ):
         self.container.markdown(    self.text  )
 
 if uploaded_file is not None:
+    # API 키를 먼저 입력해야 임베딩/모델 호출이 가능
+    if not openai_key:
+        st.warning(  "먼저 OPENAI_API_KEY 를 입력하세요."  )
+        st.stop()
+
     pages = pdf_to_document(   uploaded_file   )
     # st.success(   f"PDF 페이지 : {len(pages)}"  )
 
@@ -78,7 +84,7 @@ if uploaded_file is not None:
 
     embeddings = OpenAIEmbeddings(  api_key=openai_key   )
 
-    db = Chroma.from_documents(
+    db = InMemoryVectorStore.from_documents(
         documents=texts,
         embedding=embeddings
     )
@@ -96,7 +102,7 @@ if uploaded_file is not None:
         if question == "":
             st.warning( "질문을 입력하세요"   )
         else:
-            with st.spinner(  "답변 생성중..."  ,show_time=True  ): 
+            with st.spinner(  "답변 생성중..."  ,show_time=True  ):
 
                 chat_box = st.empty()
 
