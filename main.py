@@ -1,14 +1,3 @@
-import sys
-try:
-    __import__('pysqlite3')
-    sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-except ImportError:
-    pass  # 로컬(Windows)에선 pysqlite3 없음 → 그냥 기본 sqlite3 사용
-
-from dotenv import load_dotenv
-load_dotenv()
-# ... 나머지 기존 import
-
 from dotenv import load_dotenv
 # .env 파일 안의 OPENAI_API_KEY 읽기
 load_dotenv()
@@ -23,8 +12,8 @@ from langchain_community.document_loaders import PyPDFLoader
 # 문서 Splitter
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-# Chroma Vector DB
-from langchain_chroma import Chroma
+# Vector DB (메모리 내장형 — chromadb/sqlite/protobuf 불필요)
+from langchain_core.vectorstores import InMemoryVectorStore
 
 
 # OpenAI 모델
@@ -71,7 +60,7 @@ if uploaded_file is not None:
 
 
 
-    db = Chroma.from_documents(
+    db = InMemoryVectorStore.from_documents(
 
         documents=texts,
 
