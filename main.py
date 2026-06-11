@@ -132,4 +132,4 @@ if uploaded_file is not None:
                     document_chain
                 )
 
-                qa_chain.invoke(    {    "input": question    }      )
+                qa_chain.stream(    {    "input": question    }      )
