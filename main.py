@@ -1,3 +1,13 @@
+import sys
+try:
+    __import__('pysqlite3')
+    sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+except ImportError:
+    pass  # 로컬(Windows)에선 pysqlite3 없음 → 그냥 기본 sqlite3 사용
+
+from dotenv import load_dotenv
+load_dotenv()
+# ... 나머지 기존 import
 
 from dotenv import load_dotenv
 # .env 파일 안의 OPENAI_API_KEY 읽기
